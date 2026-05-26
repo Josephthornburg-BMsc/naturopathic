@@ -1,0 +1,100 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Illness {
+  id          String           @id @default(uuid())
+  name        String           @unique
+  description String
+  tags        String[]
+  remedies    IllnessRemedy[]
+  symptoms    IllnessSymptom[]
+}
+
+model Remedy {
+  id            String           @id @default(uuid())
+  name          String           @unique
+  type          RemedyType
+  description   String
+  preparation   String
+  safetyNotes   String
+  evidenceLevel EvidenceLevel
+  references    Json
+  illnesses     IllnessRemedy[]
+  symptoms      RemedySymptom[]
+}
+
+model Symptom {
+  id          String           @id @default(uuid())
+  name        String           @unique
+  description String?
+  illnesses   IllnessSymptom[]
+  remedies    RemedySymptom[]
+}
+
+model IllnessRemedy {
+  id         String  @id @default(uuid())
+  illness    Illness @relation(fields: [illnessId], references: [id])
+  illnessId  String
+  remedy     Remedy  @relation(fields: [remedyId], references: [id])
+  remedyId   String
+  notes      String?
+}
+
+model IllnessSymptom {
+  id         String   @id @default(uuid())
+  illness    Illness  @relation(fields: [illnessId], references: [id])
+  illnessId  String
+  symptom    Symptom  @relation(fields: [symptomId], references: [id])
+  symptomId  String
+  notes      String?
+}
+
+model RemedySymptom {
+  id         String   @id @default(uuid())
+  remedy     Remedy   @relation(fields: [remedyId], references: [id])
+  remedyId   String
+  symptom    Symptom  @relation(fields: [symptomId], references: [id])
+  symptomId  String
+  notes      String?
+}
+
+enum RemedyType {
+  HERB
+  AROMATHERAPY
+  SUPPLEMENT
+  LIFESTYLE
+  OTHER
+}
+
+enum EvidenceLevel {
+  TRADITIONAL
+  LIMITED_STUDIES
+  MODERATE_EVIDENCE
+  STRONG_EVIDENCE
+}
+
+model Remedy {
+  id            String           @id @default(uuid())
+  name          String           @unique
+  type          RemedyType
+  description   String
+  preparation   String
+  safetyNotes   String
+  evidenceLevel EvidenceLevel
+  references    Json
+
+  // NEW SAFETY FIELDS
+  safePregnancy     Boolean      @default(true)
+  safeBreastfeeding Boolean      @default(true)
+  contraindications String[]     // e.g., ["hypertension", "liver-disease"]
+  interactions      String[]     // e.g., ["SSRI", "MAOI", "blood-thinners"]
+  allergens         String[]     // e.g., ["ragweed", "pollen"]
+
+  illnesses     IllnessRemedy[]
+  symptoms      RemedySymptom[]
+}
