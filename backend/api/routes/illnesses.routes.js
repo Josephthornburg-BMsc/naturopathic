@@ -1,9 +1,14 @@
 const express = require("express");
 const router = express.Router();
 
-// Example route
 router.get("/", (req, res) => {
-  res.json({ message: "Illnesses endpoint working" });
+  const illnesses = [
+    { id: 1, name: "Flu" },
+    { id: 2, name: "Cold" },
+    { id: 3, name: "Allergies" }
+  ];
+
+  res.json(illnesses);
 });
 
 module.exports = router;
